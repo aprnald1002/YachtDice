@@ -18,6 +18,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        diceNumberText.text = diceNumber.ToString();
+        
     }
 }
