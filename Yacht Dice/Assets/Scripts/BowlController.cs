@@ -4,9 +4,15 @@ using UnityEngine;
 public class BowlController : MonoBehaviour
 {
     private Vector3 originalPosition;
+    [Header("Space : 컵 흔듬, C : 주사위 부음\n")]   
+    [Header("회전, 이동할 위치")]
+    public float xRotationValue;
     public float zMoveDistance;
-    public float delay;
+
+    [Header("각종 조건들")]
+    [Tooltip("컵이 움직일 준비가 되어있는지")]
     public bool isReady;
+    [Tooltip("컵이 움직이는지")]
     public bool isMove;
 
     private void Awake()
@@ -25,45 +31,68 @@ public class BowlController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                StartCoroutine(ApplyForceCoroutine());
+                StartCoroutine(RollDice(0.1f, true));
+            }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                StartCoroutine(RollDice(2f, false));
             }
         }
     }
 
-    private IEnumerator ApplyForceCoroutine()
+    // rollDiceType : true면 주사위 흔드는거, false면 주사위 부워버림
+    private IEnumerator RollDice(float moveDelay, bool rollDiceType)
     {
         isMove = true;
-
-        Vector3 targetPosition = originalPosition + new Vector3(0, 0, zMoveDistance);
-
-        // 지정된 시간 동안 이동합니다.
-        float elapsedTime = 0f;
-        while (elapsedTime < delay)
+        Vector3 targetPosition;
+        Quaternion targetRotation;
+        
+        
+        if (rollDiceType)
         {
-            transform.position = Vector3.Lerp(originalPosition, targetPosition, elapsedTime / delay);
+            targetPosition = originalPosition + new Vector3(0, 0, zMoveDistance);
+            targetRotation = Quaternion.Euler(0, 0, 0);
+        }
+        else
+        {
+            targetPosition = originalPosition + new Vector3(0, 0, (zMoveDistance * 3));
+            targetRotation = Quaternion.Euler(xRotationValue, 0, 0);
+        }
+
+        float elapsedTime = 0f;
+        while (elapsedTime < moveDelay)
+        {
+            transform.position = Vector3.Lerp(originalPosition, targetPosition, elapsedTime / moveDelay);
             elapsedTime += Time.deltaTime;
             yield return null;
+        }
+
+        if (!rollDiceType) {
+            elapsedTime = 0f;
+            while (elapsedTime < moveDelay)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, elapsedTime / moveDelay);
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
         }
 
         transform.position = targetPosition;
+        transform.rotation = targetRotation;
 
-        // 원래 위치로 부드럽게 되돌아가기
         elapsedTime = 0f;
-        while (elapsedTime < delay)
+        while (elapsedTime < moveDelay)
         {
-            transform.position = Vector3.Lerp(targetPosition, originalPosition, elapsedTime / delay);
+            transform.position = Vector3.Lerp(targetPosition, originalPosition, elapsedTime / moveDelay);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, elapsedTime / moveDelay);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        // 최종적으로 원래 위치로 설정합니다.
         transform.position = originalPosition;
+        transform.rotation = Quaternion.identity;
 
         isMove = false;
-    }
-
-    private IEnumerator ThrowDice()
-    {
-        yield return null;
     }
 }
