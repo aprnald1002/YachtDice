@@ -1,12 +1,21 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BowlController : MonoBehaviour
 {
+    public static BowlController Instance = null;
+    
+    [Header("컵 정보들")]
+    [SerializeField]
     private Vector3 originalPosition;
-    [Header("Space : 컵 흔듬, C : 주사위 부음\n")]   
+    public BoxCollider boxCollider;
+    
+    [Header("\nSpace : 컵 흔듬, C : 주사위 부음\n")]
     [Header("회전, 이동할 위치")]
     public float xRotationValue;
+    public float rotationTime;
     public float zMoveDistance;
 
     [Header("각종 조건들")]
@@ -14,12 +23,18 @@ public class BowlController : MonoBehaviour
     public bool isReady;
     [Tooltip("컵이 움직이는지")]
     public bool isMove;
+    
+    
 
     private void Awake()
     {
+
+        if (Instance == null) {
+            Instance = this;
+        }
+        
         originalPosition = transform.position;
         isMove = false;
-        isReady = true;
     }
 
     private void Update()
@@ -36,7 +51,7 @@ public class BowlController : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.C))
             {
-                StartCoroutine(RollDice(2f, false));
+                StartCoroutine(RollDice(1f, false));
             }
         }
     }
@@ -47,7 +62,8 @@ public class BowlController : MonoBehaviour
         isMove = true;
         Vector3 targetPosition;
         Quaternion targetRotation;
-        
+
+        boxCollider.isTrigger = !rollDiceType;
         
         if (rollDiceType)
         {
@@ -68,15 +84,17 @@ public class BowlController : MonoBehaviour
             yield return null;
         }
 
-        if (!rollDiceType) {
+        // 자연스러운 회전 애니메이션
+        if (!rollDiceType)
+        {
             elapsedTime = 0f;
-            while (elapsedTime < moveDelay)
+            while (elapsedTime < rotationTime / (rotationTime / 3))
             {
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, elapsedTime / moveDelay);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(xRotationValue, 0, 0), elapsedTime / rotationTime);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
-        }
+        } 
 
         transform.position = targetPosition;
         transform.rotation = targetRotation;
