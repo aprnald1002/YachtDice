@@ -116,7 +116,7 @@ public class Dice : MonoBehaviour
         Vector3 direction = (lookAt.transform.position - transform.position).normalized;
         _isRoll = true;
         rb.useGravity = true;
-        rb.AddForce(direction * GetRandom(500, 700));
+        rb.AddForce(direction * GetRandom(500, 800));
     }
 
     private void HandleDiceUsed()

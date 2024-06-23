@@ -52,7 +52,6 @@ public class ScoreCalculator : MonoBehaviour
 
         // Lower Section
         lowerValue.Add(CalculateChance(dicesValue)); // Chance
-        lowerValue.Add(CalculateThreeOfAKind(dicesValue)); // Three of a Kind
         lowerValue.Add(CalculateFourOfAKind(dicesValue)); // Four of a Kind
         lowerValue.Add(CalculateFullHouse(dicesValue)); // Full House
         lowerValue.Add(CalculateSmallStraight(dicesValue)); // Small Straight
@@ -81,13 +80,6 @@ public class ScoreCalculator : MonoBehaviour
     {
         // 주사위 값 리스트에서 특정 값(targetValue)의 총 합을 반환
         return dicesValue.Where(dice => dice == targetValue).Sum(); 
-    }
-
-    // Three of a Kind 계산 메서드
-    private int CalculateThreeOfAKind(List<int> dicesValue)
-    {
-        // 주사위 값 리스트에서 3개 이상 동일한 값이 있는지 확인 후 총 합 반환
-        return HasNOfAKind(dicesValue, 3) ? dicesValue.Sum() : 0;
     }
 
     // Four of a Kind 계산 메서드

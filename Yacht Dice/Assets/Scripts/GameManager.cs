@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     private int twoTotal;
 
     private List<int> twoPlayerScore;
+
+    public List<GameObject> playerIcon = new List<GameObject>();
     
     private void Awake()
     {
@@ -106,7 +108,9 @@ public class GameManager : MonoBehaviour
             twoPlayerScore = GetUpdatedScoreList(twoUpperValue, twoSubtotal, twoBonus, twoLowerValue, twoTotal);
         }
 
+        playerIcon[turn - 1].SetActive(false);
         turn = turn == 2 ? 1 : turn + 1;
+        playerIcon[turn - 1].SetActive(true);
         if (turn == 1)
         {
             turnCount++;
@@ -157,6 +161,7 @@ public class GameManager : MonoBehaviour
         var rb = table.GetComponent<Rigidbody>();
         rb.useGravity = true;
         rb.isKinematic = false;
-        rb.AddForce(new Vector3(10000, 10000, 10000));
+        rb.AddTorque(new Vector3(50, 0, 0), ForceMode.Force);
+        rb.AddForce(new Vector3(-5000, -5000, 0));
     }
 }
